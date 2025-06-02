@@ -1,83 +1,83 @@
 #!/bin/bash
 
-# Получаем текущий час и минуты (убираем ведущие нули)
+# Get current hour and minutes (remove leading zeros)
 current_hour=$(date +%-H)
 current_minute=$(date +%-M)
 
-# Добавляем отладочный вывод
-echo "Текущее время: $current_hour:$current_minute"
+# Add debug output
+echo "Current time: $current_hour:$current_minute"
 
-# Функция для расчета яркости
+# Function to calculate brightness
 calculate_brightness() {
-    # Если время между 17:00 и 23:59
+    # If time is between 17:00 and 23:59
     if [ $current_hour -ge 17 ] && [ $current_hour -lt 24 ]; then
-        # Общее количество минут от 17:00 до 24:00
-        local total_minutes_decrease=420  # 7 часов * 60 минут
+        # Total minutes from 17:00 to 24:00
+        local total_minutes_decrease=420  # 7 hours * 60 minutes
         
-        # Текущее количество минут от 17:00
+        # Current minutes since 17:00
         local minutes_since_17=$(( (current_hour - 17) * 60 + current_minute ))
         
-        # Линейная интерполяция от 100% до 2%
-        # Формула: 100 - (minutes_since_17 / total_minutes_decrease) * (100 - 2)
+        # Linear interpolation from 100% to 2%
+        # Formula: 100 - (minutes_since_17 / total_minutes_decrease) * (100 - 2)
         local brightness=$(( 100 - (minutes_since_17 * 98 / total_minutes_decrease) ))
         
-        # Выводим отладочную информацию в stderr
-        echo "Время $current_hour:$current_minute. Уменьшение яркости." >&2
-        echo "Минут после 17:00: $minutes_since_17" >&2
-        echo "Расчетная яркость: $brightness%" >&2
+        # Output debug information to stderr
+        echo "Time $current_hour:$current_minute. Decreasing brightness." >&2
+        echo "Minutes after 17:00: $minutes_since_17" >&2
+        echo "Calculated brightness: $brightness%" >&2
         
-        # Ограничиваем минимальную яркость до 2%
+        # Limit minimum brightness to 2%
         if [ $brightness -lt 2 ]; then
             brightness=2
         fi
         
-        # Возвращаем только числовое значение
+        # Return only numeric value
         echo $brightness
-    # Если время между 00:00 и 06:59
+    # If time is between 00:00 and 06:59
     elif [ $current_hour -lt 7 ]; then
-        echo "Время $current_hour:$current_minute. Минимальная яркость." >&2
+        echo "Time $current_hour:$current_minute. Minimum brightness." >&2
         echo 2
-    # Если время между 07:00 и 08:59
+    # If time is between 07:00 and 08:59
     elif [ $current_hour -ge 7 ] && [ $current_hour -lt 9 ]; then
-        # Общее количество минут от 07:00 до 09:00
-        local total_minutes_increase=120 # 2 часа * 60 минут
+        # Total minutes from 07:00 to 09:00
+        local total_minutes_increase=120 # 2 hours * 60 minutes
         
-        # Текущее количество минут от 07:00
+        # Current minutes since 07:00
         local minutes_since_7=$(( (current_hour - 7) * 60 + current_minute ))
         
-        # Линейная интерполяция от 2% до 100%
-        # Формула: 2 + (minutes_since_7 / total_minutes_increase) * (100 - 2)
+        # Linear interpolation from 2% to 100%
+        # Formula: 2 + (minutes_since_7 / total_minutes_increase) * (100 - 2)
         local brightness=$(( 2 + (minutes_since_7 * 98 / total_minutes_increase) ))
         
-        # Выводим отладочную информацию в stderr
-        echo "Время $current_hour:$current_minute. Увеличение яркости." >&2
-        echo "Минут после 07:00: $minutes_since_7" >&2
-        echo "Расчетная яркость: $brightness%" >&2
+        # Output debug information to stderr
+        echo "Time $current_hour:$current_minute. Increasing brightness." >&2
+        echo "Minutes after 07:00: $minutes_since_7" >&2
+        echo "Calculated brightness: $brightness%" >&2
         
-        # Ограничиваем максимальную яркость до 100% (на всякий случай)
+        # Limit maximum brightness to 100% (just in case)
         if [ $brightness -gt 100 ]; then
             brightness=100
         fi
         
-        # Возвращаем только числовое значение
+        # Return only numeric value
         echo $brightness
-    # Иначе (время между 09:00 и 16:59)
+    # Otherwise (time between 09:00 and 16:59)
     else
-        echo "Время $current_hour:$current_minute. Максимальная яркость." >&2
+        echo "Time $current_hour:$current_minute. Maximum brightness." >&2
         echo 100
     fi
 }
 
-# Получаем расчетную яркость (только число)
+# Get calculated brightness (only number)
 brightness=$(calculate_brightness)
 
-# Добавляем отладочный вывод
-echo "Итоговая яркость: $brightness"
+# Add debug output
+echo "Final brightness: $brightness"
 
-# Если яркость определена, устанавливаем её
+# If brightness is defined, set it
 if [ ! -z "$brightness" ]; then
-    echo "Устанавливаем яркость: $brightness%"
+    echo "Setting brightness: $brightness%"
     sudo brightnessctl set "$brightness%"
 else
-    echo "Яркость не определена (ошибка в расчетах)"
+    echo "Brightness not defined (error in calculations)"
 fi

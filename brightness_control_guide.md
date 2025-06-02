@@ -13,6 +13,7 @@ Our script will:
 ## Prerequisites
 
 - Ubuntu 22.04 (should work on other Ubuntu versions too)
+- X11 Server
 - Terminal access with sudo privileges
 - A laptop or monitor that supports brightness control
 
@@ -286,6 +287,10 @@ sudo crontab -l | grep TimeBasedBrightControl
 This time-based brightness control system provides a smooth, automated way to manage screen brightness throughout the day. The linear interpolation ensures gradual transitions that are easy on the eyes, while the cron-based automation means you'll never have to manually adjust brightness again.
 
 The script is highly customizable, allowing you to adjust time ranges, brightness levels, and update frequencies to match your specific needs and schedule.
+
+## Ready Script
+
+You can find the complete working script in this repository: [TimeBasedBrightControl](https://github.com/pefbrute/TimeBasedBrightControl)
 
 ---
 
